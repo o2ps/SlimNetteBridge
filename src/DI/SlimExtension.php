@@ -110,18 +110,18 @@ class SlimExtension extends CompilerExtension
 			->setClass(Slim\Handlers\Error::class, [$config['settings']['displayErrorDetails']])
 			->setAutowired(FALSE);
 
-        $builder->addDefinition('notFoundHandler')
-	        ->setClass(Slim\Handlers\NotFound::class)
-	        ->setAutowired(FALSE);
+		$builder->addDefinition('notFoundHandler')
+			->setClass(Slim\Handlers\NotFound::class)
+			->setAutowired(FALSE);
 
-        $builder->addDefinition('notAllowedHandler')
-	        ->setClass(Slim\Handlers\NotAllowed::class)
-	        ->setAutowired(FALSE);
+		$builder->addDefinition('notAllowedHandler')
+			->setClass(Slim\Handlers\NotAllowed::class)
+			->setAutowired(FALSE);
 
-        $builder->addDefinition('callableResolver')
+		$builder->addDefinition('callableResolver')
 			->setClass(Slim\Interfaces\CallableResolverInterface::class)
 			->setFactory(Slim\CallableResolver::class)
-	        ->setAutowired(FALSE);
+			->setAutowired(FALSE);
 	}
 
 }
