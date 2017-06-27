@@ -1,0 +1,19 @@
+dist: trusty
+sudo: false
+language: php
+
+php:
+  - 7.1
+
+before_script:
+  - travis_retry composer self-update
+  - travis_retry composer install --no-interaction --prefer-source
+  - vendor/bin/parallel-lint -e php,phpt --exclude vendor .
+  - vendor/bin/phpstan analyze -c phpstan.neon -l 7 src tests
+
+script:
+  - vendor/bin/tester tests
+
+cache:
+  directories:
+    - $HOME/.composer/cache

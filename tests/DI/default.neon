@@ -1,0 +1,3 @@
+extensions:
+	- Arachne\ContainerAdapter\DI\ContainerAdapterExtension
+	slim: Oops\SlimNetteBridge\DI\SlimExtension(%debugMode%)
