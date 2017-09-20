@@ -10,6 +10,7 @@ use Nette\PhpGenerator\PhpLiteral;
 use Nette\Utils\ArrayHash;
 use Oops\SlimNetteBridge\Application\ApplicationFactory;
 use Oops\SlimNetteBridge\Application\ChainApplicationConfigurator;
+use Oops\SlimNetteBridge\Container\ContainerAdapter;
 use Oops\SlimNetteBridge\Http\DefaultResponseFactory;
 use Psr\Container\ContainerInterface;
 use Psr\Http;
@@ -44,6 +45,11 @@ class SlimExtension extends CompilerExtension
 		$builder = $this->getContainerBuilder();
 		$config = $this->validateConfig($this->defaults);
 
+		$containerAdapter = $builder->addDefinition($this->prefix('containerAdapter'))
+			->setClass(ContainerInterface::class)
+			->setFactory(ContainerAdapter::class, [$this->name])
+			->setAutowired(FALSE);
+
 		$chainConfigurator = $builder->addDefinition($this->prefix('configurator'))
 			->setClass(ChainApplicationConfigurator::class)
 			->setAutowired(FALSE);
@@ -57,70 +63,69 @@ class SlimExtension extends CompilerExtension
 		}
 
 		$builder->addDefinition($this->prefix('applicationFactory'))
-			->setClass(ApplicationFactory::class, ['@' . ContainerInterface::class, $chainConfigurator])
+			->setClass(ApplicationFactory::class, [$containerAdapter, $chainConfigurator])
 			->setAutowired(FALSE);
 
 		$builder->addDefinition($this->prefix('application'))
 			->setClass(Slim\App::class)
 			->setFactory($this->prefix('@applicationFactory::createApplication'));
 
-
 		/**
 		 * SERVICES REQUIRED BY SLIM FRAMEWORK
 		 * {@see Slim\DefaultServicesProvider}
 		 */
 
-		$builder->addDefinition('settings')
+		$builder->addDefinition($this->prefix('settings'))
 			->setClass(ArrayHash::class)
 			->setFactory(ArrayHash::class . '::from', [$config['settings']])
 			->setAutowired(FALSE);
 
-		$builder->addDefinition('environment')
+		$builder->addDefinition($this->prefix('environment'))
 			->setClass(Slim\Interfaces\Http\EnvironmentInterface::class)
 			->setFactory(Slim\Http\Environment::class, [new PhpLiteral('$_SERVER')])
 			->setAutowired(FALSE);
 
-		$builder->addDefinition('request')
+		$builder->addDefinition($this->prefix('request'))
 			->setClass(Http\Message\ServerRequestInterface::class)
-			->setFactory(Slim\Http\Request::class . '::createFromEnvironment', ['@environment'])
+			->setFactory(Slim\Http\Request::class . '::createFromEnvironment', [$this->prefix('@environment')])
 			->setAutowired(FALSE);
 
-		$builder->addDefinition('response')
+		$builder->addDefinition($this->prefix('response'))
 			->setClass(Http\Message\ResponseInterface::class)
 			->setFactory(DefaultResponseFactory::class . '::createResponse', [$config['settings']['httpVersion']])
 			->setAutowired(FALSE);
 
-		$builder->addDefinition('router')
+		$builder->addDefinition($this->prefix('router'))
 			->setClass(Slim\Interfaces\RouterInterface::class)
 			->setFactory(Slim\Router::class)
 			->addSetup('setCacheFile', [$config['settings']['routerCacheFile']])
-			->addSetup('setContainer', ['@' . ContainerInterface::class])
+			->addSetup('setContainer', [$containerAdapter])
 			->setAutowired(FALSE);
 
-		$builder->addDefinition('foundHandler')
+		$builder->addDefinition($this->prefix('foundHandler'))
 			->setClass(Slim\Interfaces\InvocationStrategyInterface::class)
 			->setFactory(Slim\Handlers\Strategies\RequestResponse::class)
 			->setAutowired(FALSE);
 
-		$builder->addDefinition('phpErrorHandler')
+		$builder->addDefinition($this->prefix('phpErrorHandler'))
 			->setClass(Slim\Handlers\PhpError::class, [$config['settings']['displayErrorDetails']])
 			->setAutowired(FALSE);
 
-		$builder->addDefinition('errorHandler')
+		$builder->addDefinition($this->prefix('errorHandler'))
 			->setClass(Slim\Handlers\Error::class, [$config['settings']['displayErrorDetails']])
 			->setAutowired(FALSE);
 
-		$builder->addDefinition('notFoundHandler')
+		$builder->addDefinition($this->prefix('notFoundHandler'))
 			->setClass(Slim\Handlers\NotFound::class)
 			->setAutowired(FALSE);
 
-		$builder->addDefinition('notAllowedHandler')
+		$builder->addDefinition($this->prefix('notAllowedHandler'))
 			->setClass(Slim\Handlers\NotAllowed::class)
 			->setAutowired(FALSE);
 
-		$builder->addDefinition('callableResolver')
+		$builder->addDefinition($this->prefix('callableResolver'))
 			->setClass(Slim\Interfaces\CallableResolverInterface::class)
-			->setFactory(Slim\CallableResolver::class)
+			->setFactory(Slim\CallableResolver::class, [$containerAdapter])
 			->setAutowired(FALSE);
 	}
 
