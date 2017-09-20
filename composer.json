@@ -19,17 +19,14 @@
 		"php": ">= 7.1.0",
 		"nette/di": "^2.4.0",
 		"nette/utils": "^2.4.0",
+		"psr/container": "1.0.0",
 		"slim/slim": "^3.0.0"
 	},
 	"require-dev": {
-		"arachne/container-adapter": "dev-master",
 		"jakub-onderka/php-parallel-lint": "^0.9.0",
 		"nette/bootstrap": "^2.4.0",
 		"nette/tester": "^1.7.0",
-		"phpstan/phpstan": "^0.7.0"
-	},
-	"suggest": {
-		"arachne/container-adapter": "or any other PSR-11 wrapper for Nette DI container"
+		"phpstan/phpstan": "^0.8.0"
 	},
 	"autoload": {
 		"psr-4": {

@@ -15,8 +15,6 @@ $ composer require oops/slim-nette-bridge
 
 Oops/SlimNetteBridge requires PHP >= 7.1.
 
-You also need to install and register a PSR-11-compatible wrapper for the Nette DI container. SlimNetteBridge is tested with [`arachne/container-adapter`](https://github.com/Arachne/ContainerAdapter).
-
 
 ## Usage
 

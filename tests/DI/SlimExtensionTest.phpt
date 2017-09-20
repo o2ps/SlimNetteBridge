@@ -7,6 +7,7 @@ namespace OopsTests\SlimNetteBridge\DI;
 use Nette\Configurator;
 use Nette\DI\Container;
 use Nette\Utils\ArrayHash;
+use Psr\Container\ContainerInterface;
 use Psr\Http;
 use Slim;
 use Tester\Assert;
@@ -26,17 +27,37 @@ class SlimExtensionTest extends TestCase
 	{
 		$container = $this->createContainer('default');
 
-		Assert::type(ArrayHash::class, $container->getService('settings'));
-		Assert::type(Slim\Interfaces\Http\EnvironmentInterface::class, $container->getService('environment'));
-		Assert::type(Http\Message\RequestInterface::class, $container->getService('request'));
-		Assert::type(Http\Message\ResponseInterface::class, $container->getService('response'));
-		Assert::type(Slim\Router::class, $container->getService('router'));
-		Assert::type(Slim\Handlers\Strategies\RequestResponse::class, $container->getService('foundHandler'));
-		Assert::type(Slim\Handlers\PhpError::class, $container->getService('phpErrorHandler'));
-		Assert::type(Slim\Handlers\Error::class, $container->getService('errorHandler'));
-		Assert::type(Slim\Handlers\NotFound::class, $container->getService('notFoundHandler'));
-		Assert::type(Slim\Handlers\NotAllowed::class, $container->getService('notAllowedHandler'));
-		Assert::type(Slim\CallableResolver::class, $container->getService('callableResolver'));
+		Assert::type(ArrayHash::class, $container->getService('slim.settings'));
+		Assert::type(Slim\Interfaces\Http\EnvironmentInterface::class, $container->getService('slim.environment'));
+		Assert::type(Http\Message\RequestInterface::class, $container->getService('slim.request'));
+		Assert::type(Http\Message\ResponseInterface::class, $container->getService('slim.response'));
+		Assert::type(Slim\Router::class, $container->getService('slim.router'));
+		Assert::type(Slim\Handlers\Strategies\RequestResponse::class, $container->getService('slim.foundHandler'));
+		Assert::type(Slim\Handlers\PhpError::class, $container->getService('slim.phpErrorHandler'));
+		Assert::type(Slim\Handlers\Error::class, $container->getService('slim.errorHandler'));
+		Assert::type(Slim\Handlers\NotFound::class, $container->getService('slim.notFoundHandler'));
+		Assert::type(Slim\Handlers\NotAllowed::class, $container->getService('slim.notAllowedHandler'));
+		Assert::type(Slim\CallableResolver::class, $container->getService('slim.callableResolver'));
+	}
+
+
+	public function testContainerAdapter(): void
+	{
+		$container = $this->createContainer('default');
+		$containerAdapter = $container->getService('slim.containerAdapter');
+
+		Assert::type(ContainerInterface::class, $containerAdapter);
+		Assert::same($container->getService('slim.settings'), $containerAdapter->get('settings'));
+		Assert::same($container->getService('slim.environment'), $containerAdapter->get('environment'));
+		Assert::same($container->getService('slim.request'), $containerAdapter->get('request'));
+		Assert::same($container->getService('slim.response'), $containerAdapter->get('response'));
+		Assert::same($container->getService('slim.router'), $containerAdapter->get('router'));
+		Assert::same($container->getService('slim.foundHandler'), $containerAdapter->get('foundHandler'));
+		Assert::same($container->getService('slim.phpErrorHandler'), $containerAdapter->get('phpErrorHandler'));
+		Assert::same($container->getService('slim.errorHandler'), $containerAdapter->get('errorHandler'));
+		Assert::same($container->getService('slim.notFoundHandler'), $containerAdapter->get('notFoundHandler'));
+		Assert::same($container->getService('slim.notAllowedHandler'), $containerAdapter->get('notAllowedHandler'));
+		Assert::same($container->getService('slim.callableResolver'), $containerAdapter->get('callableResolver'));
 	}
 
 
@@ -45,7 +66,7 @@ class SlimExtensionTest extends TestCase
 		$container = $this->createContainer('settings');
 
 		/** @var ArrayHash $settings */
-		$settings = $container->getService('settings');
+		$settings = $container->getService('slim.settings');
 		Assert::same('1.1', $settings['httpVersion']);
 		Assert::false($settings['addContentLengthHeader']);
 	}
