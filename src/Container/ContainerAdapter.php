@@ -33,7 +33,9 @@ final class ContainerAdapter implements ContainerInterface
 	public function get($id)
 	{
 		try {
-			return $this->container->getService($this->prefix($id));
+			return \class_exists($id)
+				? $this->container->getByType($id)
+				: $this->container->getService($this->prefix($id));
 
 		} catch (MissingServiceException $exception) {
 			throw new ServiceNotFoundException($exception->getMessage(), $exception->getCode(), $exception);
@@ -46,7 +48,9 @@ final class ContainerAdapter implements ContainerInterface
 
 	public function has($id)
 	{
-		return $this->container->hasService($this->prefix($id));
+		return \class_exists($id)
+			? (bool) $this->container->getByType($id, FALSE)
+			: $this->container->hasService($this->prefix($id));
 	}
 
 

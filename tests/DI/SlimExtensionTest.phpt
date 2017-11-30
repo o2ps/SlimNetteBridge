@@ -76,8 +76,6 @@ class SlimExtensionTest extends TestCase
 	{
 		$container = $this->createContainer('configurators');
 
-		/** @var Slim\App $app */
-		$app = $container->getByType(Slim\App::class);
 		$request = new Slim\Http\Request(
 			'GET',
 			new Slim\Http\Uri('http', 'example.com', NULL, '/whoami'),
@@ -85,11 +83,34 @@ class SlimExtensionTest extends TestCase
 			[],
 			[],
 			new Slim\Http\Stream(\fopen('php://input', 'r'))
-		);;
+		);
+		$this->assertRequest($container, $request, 418, "I'm a teapot");
+	}
 
-		$processedResponse = $app->process($request, new Slim\Http\Response());
-		Assert::same(418, $processedResponse->getStatusCode());
-		Assert::same("I'm a teapot", $processedResponse->getReasonPhrase());
+
+	public function testLazyConfigurators(): void
+	{
+		$container = $this->createContainer('lazyConfigurators');
+
+		$request = new Slim\Http\Request(
+			'GET',
+			new Slim\Http\Uri('http', 'example.com', NULL, '/whoami'),
+			new Slim\Http\Headers(),
+			[],
+			[],
+			new Slim\Http\Stream(\fopen('php://input', 'r'))
+		);
+		$this->assertRequest($container, $request, 418, "I'm a teapot");
+
+		$request = new Slim\Http\Request(
+			'POST',
+			new Slim\Http\Uri('http', 'example.com', NULL, '/whoami'),
+			new Slim\Http\Headers(),
+			[],
+			[],
+			new Slim\Http\Stream(\fopen('php://input', 'r'))
+		);
+		$this->assertRequest($container, $request, 405, "Don't you try this on me");
 	}
 
 
@@ -100,6 +121,17 @@ class SlimExtensionTest extends TestCase
 		$configurator->addConfig(__DIR__ . '/' . $configFile . '.neon');
 
 		return $configurator->createContainer();
+	}
+
+
+	private function assertRequest(Container $container, Slim\Http\Request $request, int $statusCode, string $statusReason): void
+	{
+		/** @var Slim\App $app */
+		$app = $container->getByType(Slim\App::class);
+
+		$processedResponse = $app->process($request, new Slim\Http\Response());
+		Assert::same($statusCode, $processedResponse->getStatusCode());
+		Assert::same($statusReason, $processedResponse->getReasonPhrase());
 	}
 
 }

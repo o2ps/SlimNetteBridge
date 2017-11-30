@@ -1,0 +1,9 @@
+extensions:
+	slim: Oops\SlimNetteBridge\DI\SlimExtension(%debugMode%)
+
+slim:
+	configurators:
+		- OopsTests\SlimNetteBridge\LazyConfiguratorMock
+
+services:
+	- OopsTests\SlimNetteBridge\LazyMiddleware
