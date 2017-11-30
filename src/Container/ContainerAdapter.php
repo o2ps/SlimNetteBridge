@@ -49,7 +49,7 @@ final class ContainerAdapter implements ContainerInterface
 	public function has($id)
 	{
 		return \class_exists($id)
-			? $this->container->getByType($id, FALSE) !== NULL
+			? (bool) $this->container->getByType($id, FALSE)
 			: $this->container->hasService($this->prefix($id));
 	}
 
