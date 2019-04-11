@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace Oops\SlimNetteBridge\DI;
 
 use Nette\DI\CompilerExtension;
-use Nette\DI\Statement;
+use Nette\DI\Definitions\Statement;
 use Nette\PhpGenerator\PhpLiteral;
 use Nette\Utils\ArrayHash;
 use Oops\SlimNetteBridge\Application\ApplicationFactory;
