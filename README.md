@@ -7,6 +7,11 @@
 This package helps you quickly build a [Slim Framework](https://www.slimframework.com) application, utilizing the power of [Nette DI container](https://github.com/nette/di). 
 
 
+## THIS PACKAGE IS NO LONGER MAINTAINED!
+
+As suggested in [#6](https://github.com/o2ps/SlimNetteBridge/issues/6), you can use [slimapi/slimapi](https://github.com/slimapi/slimapi) instead.
+
+
 ## Installation and requirements
 
 ```bash
